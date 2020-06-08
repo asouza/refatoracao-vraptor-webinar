@@ -46,6 +46,7 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Supplier;
 import com.google.common.collect.FluentIterable;
 
+//25 pontos no total
 /**
  * The default implementation of controller localization rules. It also uses a Path annotation to discover
  * path-&gt;method mappings using the supplied ControllerLookupInterceptor.
@@ -57,6 +58,7 @@ public class DefaultRouter implements Router {
 	
 	private static final Logger logger = LoggerFactory.getLogger(DefaultRouter.class);
 
+	//11 pontos de acoplamento contextual
 	private final Collection<Route> routes = new PriorityRoutesList();
 	private final Proxifier proxifier;
 	private final TypeFinder finder;
@@ -106,6 +108,7 @@ public class DefaultRouter implements Router {
 		routes.add(r);
 	}
 
+	//3 pontos
 	@Override
 	public ControllerMethod parse(String uri, HttpMethod method, MutableRequest request) throws MethodNotAllowedException {
 		Collection<Route> routesMatchingUriAndMethod = routesMatchingUriAndMethod(uri, method);
@@ -118,6 +121,7 @@ public class DefaultRouter implements Router {
 		return route.controllerMethod(request, uri);
 	}
 
+	//2 pontos if + httpmethod
 	private void checkIfThereIsAnotherRoute(String uri, HttpMethod method, Iterator<Route> iterator, Route route) {
 		if (iterator.hasNext()) {
 			Route otherRoute = iterator.next();
@@ -127,6 +131,7 @@ public class DefaultRouter implements Router {
 		}
 	}
 
+	// 1 ponto do if
 	private Collection<Route> routesMatchingUriAndMethod(String uri, HttpMethod method) {
 		Collection<Route> routesMatchingMethod = FluentIterable.from(routesMatchingUri(uri))
 				.filter(allow(method)).toSet();
@@ -138,6 +143,7 @@ public class DefaultRouter implements Router {
 		return routesMatchingMethod;
 	}
 
+	//1 ponto do for
 	@Override
 	public EnumSet<HttpMethod> allowedMethodsFor(String uri) {
 		EnumSet<HttpMethod> allowed = EnumSet.noneOf(HttpMethod.class);
@@ -147,6 +153,7 @@ public class DefaultRouter implements Router {
 		return allowed;
 	}
 
+	//1 ponto do if
 	private Collection<Route> routesMatchingUri(String uri) {
 		Collection<Route> routesMatchingURI = FluentIterable.from(routes)
 				.filter(canHandle(uri)).toSet();
@@ -157,6 +164,7 @@ public class DefaultRouter implements Router {
 		return routesMatchingURI;
 	}
 
+	//3 pontos 2 do ternario + 1 do supplier
 	@Override
 	public <T> String urlFor(final Class<T> type, final Method method, Object... params) {
 		final Class<?> rawtype = proxifier.isProxyType(type) ? type.getSuperclass() : type;
@@ -182,6 +190,7 @@ public class DefaultRouter implements Router {
 		return Collections.unmodifiableList(new ArrayList<>(routes));
 	}
 
+	//1 ponto do predicate
 	private Predicate<Route> canHandle(final Class<?> type, final Method method) {
 		return new Predicate<Route>() {
 			@Override
@@ -191,6 +200,7 @@ public class DefaultRouter implements Router {
 		};
 	}
 
+	//1 ponto do predicate
 	private Predicate<Route> canHandle(final String uri) {
 		return new Predicate<Route>() {
 			@Override
@@ -200,6 +210,7 @@ public class DefaultRouter implements Router {
 		};
 	}
 
+	//1 ponto do predicate
 	private Predicate<Route> allow(final HttpMethod method) {
 		return new Predicate<Route>() {
 			@Override
