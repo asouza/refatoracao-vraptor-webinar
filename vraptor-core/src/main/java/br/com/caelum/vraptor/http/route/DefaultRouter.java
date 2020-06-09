@@ -48,6 +48,8 @@ import br.com.caelum.vraptor.proxy.Proxifier;
  * 20 pontos depois da primeira rodada movendo o criador de defaultroutebuilder
  * 
  * 16 pontos depois da primeira extracao do routes
+ * 
+ * 14 pontos
  */
 /**
  * The default implementation of controller localization rules. It also uses a Path annotation to discover
@@ -123,16 +125,8 @@ public class DefaultRouter implements Router {
 		}
 	}
 
-	// 1 ponto do if
 	private Collection<Route> routesMatchingUriAndMethod(String uri, HttpMethod method) {
-		Collection<Route> routesMatchingMethod = FluentIterable.from(routes.routesMatchingUri(uri))
-				.filter(allow(method)).toSet();
-
-		if (routesMatchingMethod.isEmpty()) {
-			EnumSet<HttpMethod> allowed = allowedMethodsFor(uri);
-			throw new MethodNotAllowedException(allowed, method.toString());
-		}
-		return routesMatchingMethod;
+		return routes.routesMatchingUriAndMethod(uri, method);
 	}
 
 	//1 ponto do for
@@ -168,13 +162,4 @@ public class DefaultRouter implements Router {
 
 
 
-	//1 ponto do predicate
-	private Predicate<Route> allow(final HttpMethod method) {
-		return new Predicate<Route>() {
-			@Override
-			public boolean apply(Route route) {
-				return route.allowedMethods().contains(method);
-			}
-		};
-	}
 }
