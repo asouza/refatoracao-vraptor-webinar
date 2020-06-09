@@ -59,15 +59,12 @@ public class DefaultRouter implements Router {
 	private static final Logger logger = LoggerFactory.getLogger(DefaultRouter.class);
 
 	//11 pontos de acoplamento contextual
+	//agora caiu para 6 pontos aqui
 	//essa colecao de routes pode virar uma classe
 	private final Collection<Route> routes = new PriorityRoutesList();
 	private final Proxifier proxifier;
-	private final TypeFinder finder;
-	private final Converters converters;
-	private final ParameterNameProvider nameProvider;
-	private final Evaluator evaluator;
 	private final CacheStore<Invocation, Route> cache;
-	private final EncodingHandler encodingHandler;
+	private final CriaDefaultRouteBuilder criaDefaultRouteBuilder;
 
 	private static final Route NULL = new NoStrategy() {
 		@Override
@@ -80,28 +77,22 @@ public class DefaultRouter implements Router {
 	 * @deprecated CDI eyes only
 	 */
 	protected DefaultRouter() {
-		this(null, null, null, null, null, null, null);
+		this(null, null, null);
 	}
 
 	@Inject
-	public DefaultRouter(Proxifier proxifier, TypeFinder finder, Converters converters,
-			ParameterNameProvider nameProvider, Evaluator evaluator, EncodingHandler encodingHandler,
-			CacheStore<Invocation, Route> cache) {
+	public DefaultRouter(Proxifier proxifier,
+			CacheStore<Invocation, Route> cache,CriaDefaultRouteBuilder criaDefaultRouteBuilder) {
 		this.proxifier = proxifier;
-		this.finder = finder;
-		this.converters = converters;
-		this.nameProvider = nameProvider;
-		this.evaluator = evaluator;
-		this.encodingHandler = encodingHandler;
 		this.cache = cache;
+		this.criaDefaultRouteBuilder = criaDefaultRouteBuilder;
 	}
 
 	@Override
 	public RouteBuilder builderFor(String uri) {		
 		//Aqui daria para criar o Builder do DefaultRouteBuilder. A classe tem tudo que ele precisa e espera a uri para 
 		//construir o objeto. É meio o que foi feito, mas aí estourou por uns 5 ponyos...
-		
-		return new DefaultRouteBuilder(proxifier, finder, converters, nameProvider, evaluator, uri, encodingHandler);
+		return criaDefaultRouteBuilder.cria(uri);		
 	}
 
 	/**
