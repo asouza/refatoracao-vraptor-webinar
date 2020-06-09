@@ -33,20 +33,23 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import br.com.caelum.vraptor.cache.CacheStore;
-import br.com.caelum.vraptor.controller.ControllerMethod;
-import br.com.caelum.vraptor.controller.HttpMethod;
-import br.com.caelum.vraptor.core.Converters;
-import br.com.caelum.vraptor.http.EncodingHandler;
-import br.com.caelum.vraptor.http.MutableRequest;
-import br.com.caelum.vraptor.http.ParameterNameProvider;
-import br.com.caelum.vraptor.proxy.Proxifier;
-
 import com.google.common.base.Predicate;
 import com.google.common.base.Supplier;
 import com.google.common.collect.FluentIterable;
 
+import br.com.caelum.vraptor.cache.CacheStore;
+import br.com.caelum.vraptor.controller.ControllerMethod;
+import br.com.caelum.vraptor.controller.HttpMethod;
+import br.com.caelum.vraptor.http.MutableRequest;
+import br.com.caelum.vraptor.proxy.Proxifier;
+
 //25 pontos no total
+
+/*
+ * 25 pontos no começo
+ * 
+ * 20 pontos depois da primeira rodada movendo o criador de defaultroutebuilder
+ */
 /**
  * The default implementation of controller localization rules. It also uses a Path annotation to discover
  * path-&gt;method mappings using the supplied ControllerLookupInterceptor.
