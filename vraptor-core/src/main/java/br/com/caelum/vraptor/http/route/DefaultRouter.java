@@ -20,9 +20,7 @@ package br.com.caelum.vraptor.http.route;
 import static com.google.common.base.Preconditions.checkState;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
@@ -34,7 +32,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Predicate;
-import com.google.common.base.Supplier;
 import com.google.common.collect.FluentIterable;
 
 import br.com.caelum.vraptor.cache.CacheStore;
@@ -49,6 +46,8 @@ import br.com.caelum.vraptor.proxy.Proxifier;
  * 25 pontos no começo
  * 
  * 20 pontos depois da primeira rodada movendo o criador de defaultroutebuilder
+ * 
+ * 16 pontos depois da primeira extracao do routes
  */
 /**
  * The default implementation of controller localization rules. It also uses a Path annotation to discover
@@ -61,20 +60,15 @@ public class DefaultRouter implements Router {
 	
 	private static final Logger logger = LoggerFactory.getLogger(DefaultRouter.class);
 
-	//11 pontos de acoplamento contextual
-	//agora caiu para 6 pontos aqui
+	//12 pontos de acoplamento contextual
+	//agora caiu para 7 pontos aqui
+	//agora caiu para 6
 	//essa colecao de routes pode virar uma classe
-	private final Collection<Route> routes = new PriorityRoutesList();
+	private final Routes routes = new Routes();
 	private final Proxifier proxifier;
 	private final CacheStore<Invocation, Route> cache;
 	private final CriaDefaultRouteBuilder criaDefaultRouteBuilder;
 
-	private static final Route NULL = new NoStrategy() {
-		@Override
-		public String urlFor(Class<?> type, Method m, Object... params) {
-			throw new RouteNotFoundException("The selected route is invalid for redirection: " + type + "." + m.getName());
-		}
-	};
 
 	/**
 	 * @deprecated CDI eyes only
@@ -131,7 +125,7 @@ public class DefaultRouter implements Router {
 
 	// 1 ponto do if
 	private Collection<Route> routesMatchingUriAndMethod(String uri, HttpMethod method) {
-		Collection<Route> routesMatchingMethod = FluentIterable.from(routesMatchingUri(uri))
+		Collection<Route> routesMatchingMethod = FluentIterable.from(routes.routesMatchingUri(uri))
 				.filter(allow(method)).toSet();
 
 		if (routesMatchingMethod.isEmpty()) {
@@ -145,36 +139,19 @@ public class DefaultRouter implements Router {
 	@Override
 	public EnumSet<HttpMethod> allowedMethodsFor(String uri) {
 		EnumSet<HttpMethod> allowed = EnumSet.noneOf(HttpMethod.class);
-		for (Route route : routesMatchingUri(uri)) {
+		for (Route route : routes.routesMatchingUri(uri)) {
 			allowed.addAll(route.allowedMethods());
 		}
 		return allowed;
 	}
 
-	//1 ponto do if
-	private Collection<Route> routesMatchingUri(String uri) {
-		Collection<Route> routesMatchingURI = FluentIterable.from(routes)
-				.filter(canHandle(uri)).toSet();
-
-		if (routesMatchingURI.isEmpty()) {
-			throw new ControllerNotFoundException();
-		}
-		return routesMatchingURI;
-	}
-
-	//3 pontos 2 do ternario + 1 do supplier
+	//2 pontos do ternario 
 	@Override
 	public <T> String urlFor(final Class<T> type, final Method method, Object... params) {
 		final Class<?> rawtype = proxifier.isProxyType(type) ? type.getSuperclass() : type;
 		final Invocation invocation = new Invocation(rawtype, method);
 
-		Route route = cache.fetch(invocation, new Supplier<Route>() {
-			@Override
-			public Route get() {
-				return FluentIterable.from(routes).filter(canHandle(rawtype, method))
-					.first().or(NULL);
-			}
-		});
+		Route route = cache.fetch(invocation, routes.lazyBla(rawtype, method));
 
 		logger.debug("Selected route for {} is {}", method, route);
 		String url = route.urlFor(type, method, params);
@@ -185,28 +162,11 @@ public class DefaultRouter implements Router {
 
 	@Override
 	public List<Route> allRoutes() {
-		return Collections.unmodifiableList(new ArrayList<>(routes));
+		return routes.allRoutes();
 	}
 
-	//1 ponto do predicate
-	private Predicate<Route> canHandle(final Class<?> type, final Method method) {
-		return new Predicate<Route>() {
-			@Override
-			public boolean apply(Route route) {
-				return route.canHandle(type, method);
-			}
-		};
-	}
 
-	//1 ponto do predicate
-	private Predicate<Route> canHandle(final String uri) {
-		return new Predicate<Route>() {
-			@Override
-			public boolean apply(Route route) {
-				return route.canHandle(uri);
-			}
-		};
-	}
+
 
 	//1 ponto do predicate
 	private Predicate<Route> allow(final HttpMethod method) {
