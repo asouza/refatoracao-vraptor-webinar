@@ -48,4 +48,6 @@ public interface Proxifier {
 	 * @return <code>true</code> if the object is a proxy, false otherwise.
 	 */
 	boolean isProxyType(Class<?> type);
+
+	<T> Class<T> rawType(Class<T> type);
 }
