@@ -69,7 +69,7 @@ public class DefaultRouterTest {
 	private DefaultRouter router;
 	private VRaptorRequest request;
 	private ControllerMethod method;
-	private CacheStore<Invocation, Route> cache;
+	private RoutesCache cache;
 	private CriaDefaultRouteBuilder criaDefaultRouteBuilder;
 	private Converters converters;
 	private EncodingHandler encodingHandler;
@@ -79,7 +79,7 @@ public class DefaultRouterTest {
 		this.request = new VRaptorRequest(mock(HttpServletRequest.class));
 		this.proxifier = new JavassistProxifier();
 		this.method = mock(ControllerMethod.class);
-		this.cache = new DefaultCacheStore<>();
+		this.cache = new RoutesCache(new DefaultCacheStore<Invocation,Route>());
 		this.converters = mock(Converters.class);
 		this.encodingHandler = mock(EncodingHandler.class);
 		this.criaDefaultRouteBuilder = new CriaDefaultRouteBuilder(

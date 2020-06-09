@@ -31,10 +31,6 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Predicate;
-import com.google.common.collect.FluentIterable;
-
-import br.com.caelum.vraptor.cache.CacheStore;
 import br.com.caelum.vraptor.controller.ControllerMethod;
 import br.com.caelum.vraptor.controller.HttpMethod;
 import br.com.caelum.vraptor.http.MutableRequest;
@@ -50,6 +46,8 @@ import br.com.caelum.vraptor.proxy.Proxifier;
  * 16 pontos depois da primeira extracao do routes
  * 
  * 14 pontos
+ * 
+ * 12 pontos
  */
 /**
  * The default implementation of controller localization rules. It also uses a Path annotation to discover
@@ -65,10 +63,11 @@ public class DefaultRouter implements Router {
 	//12 pontos de acoplamento contextual
 	//agora caiu para 7 pontos aqui
 	//agora caiu para 6
+	//agora caiu para 4
 	//essa colecao de routes pode virar uma classe
 	private final Routes routes = new Routes();
 	private final Proxifier proxifier;
-	private final CacheStore<Invocation, Route> cache;
+	private final RoutesCache cache;
 	private final CriaDefaultRouteBuilder criaDefaultRouteBuilder;
 
 
@@ -81,7 +80,7 @@ public class DefaultRouter implements Router {
 
 	@Inject
 	public DefaultRouter(Proxifier proxifier,
-			CacheStore<Invocation, Route> cache,CriaDefaultRouteBuilder criaDefaultRouteBuilder) {
+			RoutesCache cache,CriaDefaultRouteBuilder criaDefaultRouteBuilder) {
 		this.proxifier = proxifier;
 		this.cache = cache;
 		this.criaDefaultRouteBuilder = criaDefaultRouteBuilder;
