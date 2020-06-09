@@ -59,6 +59,7 @@ public class DefaultRouter implements Router {
 	private static final Logger logger = LoggerFactory.getLogger(DefaultRouter.class);
 
 	//11 pontos de acoplamento contextual
+	//essa colecao de routes pode virar uma classe
 	private final Collection<Route> routes = new PriorityRoutesList();
 	private final Proxifier proxifier;
 	private final TypeFinder finder;
@@ -96,7 +97,10 @@ public class DefaultRouter implements Router {
 	}
 
 	@Override
-	public RouteBuilder builderFor(String uri) {
+	public RouteBuilder builderFor(String uri) {		
+		//Aqui daria para criar o Builder do DefaultRouteBuilder. A classe tem tudo que ele precisa e espera a uri para 
+		//construir o objeto. É meio o que foi feito, mas aí estourou por uns 5 ponyos...
+		
 		return new DefaultRouteBuilder(proxifier, finder, converters, nameProvider, evaluator, uri, encodingHandler);
 	}
 
