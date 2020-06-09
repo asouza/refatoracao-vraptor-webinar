@@ -48,6 +48,8 @@ import br.com.caelum.vraptor.proxy.Proxifier;
  * 14 pontos
  * 
  * 12 pontos
+ * 
+ * 10 pontos
  */
 /**
  * The default implementation of controller localization rules. It also uses a Path annotation to discover
@@ -137,11 +139,10 @@ public class DefaultRouter implements Router {
 		}
 		return allowed;
 	}
-
-	//2 pontos do ternario 
+ 
 	@Override
 	public <T> String urlFor(final Class<T> type, final Method method, Object... params) {
-		final Class<?> rawtype = proxifier.isProxyType(type) ? type.getSuperclass() : type;
+		final Class<?> rawtype = proxifier.rawType(type);
 		final Invocation invocation = new Invocation(rawtype, method);
 
 		Route route = cache.fetch(invocation, routes.lazyBla(rawtype, method));

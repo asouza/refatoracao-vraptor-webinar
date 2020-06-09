@@ -115,4 +115,9 @@ public class JavassistProxifier implements Proxifier {
 			});
 		}
 	}
+
+	@Override
+	public <T> Class<T> rawType(Class<T> type) {
+		return (Class<T>) (isProxyType(type) ? type.getSuperclass() : type);
+	}
 }
